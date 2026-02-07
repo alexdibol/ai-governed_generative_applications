@@ -1,1 +1,667 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+  <title>Governance-First Generative AI — Applied Domains (Audit, Law, Advice, Consulting, Investment Banking)</title>
+  <meta name="description" content="Governance-First Generative AI for regulated professional practice: audit & accounting, law, financial advice, consulting/strategy, and investment banking. Organizational governance as architecture: gates, logs, manifests, review packets, refusal posture, and traceability. PDF + companion Colab notebooks across domain repositories." />
+
+  <style>
+    :root{
+      --bg:#07080d;
+      --panel:#0f1220;
+      --panel-2:#141836;
+      --text:#eef0ff;
+      --muted:#b8bddb;
+      --border:rgba(255,255,255,0.09);
+      --accent:#7aa2ff;
+      --accent2:#6ee7c8;
+      --warn:#ffd27a;
+      --shadow:0 18px 60px rgba(0,0,0,0.45);
+    }
+    *{box-sizing:border-box;}
+    html,body{height:100%;}
+    body{
+      margin:0;
+      background:
+        radial-gradient(900px 600px at 15% 10%, rgba(122,162,255,0.18), transparent 55%),
+        radial-gradient(800px 600px at 85% 20%, rgba(110,231,200,0.12), transparent 55%),
+        radial-gradient(900px 650px at 60% 95%, rgba(255,210,122,0.07), transparent 55%),
+        var(--bg);
+      color:var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      line-height:1.6;
+    }
+    a{color:var(--accent);text-decoration:none;}
+    a:hover{color:var(--accent2);text-decoration:underline;}
+    .container{max-width:1140px;margin:0 auto;padding:32px 20px 84px;}
+
+    /* Top bar */
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:18px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:280px;
+    }
+    .logo{
+      width:36px;height:36px;border-radius:12px;
+      background:linear-gradient(135deg, rgba(122,162,255,0.85), rgba(110,231,200,0.75));
+      box-shadow:0 10px 24px rgba(0,0,0,0.35);
+      border:1px solid rgba(255,255,255,0.14);
+    }
+    .brand div{line-height:1.2;}
+    .brand .title{
+      font-size:12px;
+      letter-spacing:0.14em;
+      text-transform:uppercase;
+      color:var(--muted);
+      font-weight:900;
+    }
+    .brand .sub{
+      font-size:12px;
+      color:var(--muted);
+      opacity:0.95;
+    }
+    .nav{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      justify-content:flex-end;
+    }
+    .nav a{
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:0.08em;
+      text-transform:uppercase;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,0.10);
+      background:rgba(0,0,0,0.14);
+      color:var(--muted);
+    }
+    .nav a:hover{
+      background:rgba(0,0,0,0.22);
+      border-color: rgba(122,162,255,0.35);
+      text-decoration:none;
+      color:var(--text);
+    }
+
+    /* Hero */
+    .hero{
+      padding:38px 34px;
+      border-radius:22px;
+      background:linear-gradient(180deg, rgba(20,24,54,0.92), rgba(15,18,32,0.88));
+      border:1px solid var(--border);
+      box-shadow:var(--shadow);
+      position:relative;
+      overflow:hidden;
+    }
+    .hero:before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background:
+        radial-gradient(520px 360px at 16% 0%, rgba(122,162,255,0.18), transparent 60%),
+        radial-gradient(460px 330px at 92% 18%, rgba(110,231,200,0.10), transparent 60%),
+        radial-gradient(520px 360px at 55% 110%, rgba(255,210,122,0.08), transparent 60%);
+      pointer-events:none;
+      opacity:0.9;
+    }
+    .hero > *{position:relative;}
+
+    .kicker{
+      text-transform:uppercase;
+      letter-spacing:0.18em;
+      font-size:12px;
+      color:var(--muted);
+    }
+    .hero h1{
+      font-size:38px;
+      margin:12px 0 10px;
+      line-height:1.15;
+      max-width:78ch;
+      text-transform:uppercase;
+      letter-spacing:0.02em;
+    }
+    .subtitle{
+      margin:0;
+      max-width:110ch;
+      color:var(--muted);
+      font-size:16px;
+    }
+
+    .section{margin-top:56px;}
+    .section h2{
+      font-size:28px;
+      margin:0 0 14px;
+      letter-spacing:-0.02em;
+    }
+    .section p{color:var(--muted);max-width:110ch;margin:10px 0;}
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(270px,1fr));
+      gap:18px;
+      margin-top:22px;
+    }
+    .card{
+      padding:20px 20px;
+      border-radius:18px;
+      background:rgba(20,24,54,0.72);
+      border:1px solid var(--border);
+      box-shadow:0 10px 30px rgba(0,0,0,0.30);
+    }
+    .card h3{
+      margin:0 0 10px;
+      font-size:18px;
+      line-height:1.25;
+    }
+    .card p{
+      margin:0;
+      font-size:14px;
+      color:var(--muted);
+    }
+
+    .linkcard{
+      display:block;
+      cursor:pointer;
+      transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+      color:inherit;
+      text-decoration:none;
+    }
+    .linkcard:hover{
+      transform: translateY(-2px);
+      border-color: rgba(122,162,255,0.35);
+      background: rgba(20,24,54,0.86);
+      text-decoration:none;
+    }
+    .linkcard:focus{
+      outline:2px solid rgba(110,231,200,0.46);
+      outline-offset:3px;
+    }
+    .hint{
+      margin-top:12px;
+      font-size:12px;
+      color:var(--muted);
+      opacity:0.92;
+      font-weight:700;
+      letter-spacing:0.02em;
+    }
+
+    .callout{
+      margin-top:18px;
+      padding:18px 18px;
+      border-radius:18px;
+      border:1px solid rgba(122,162,255,0.18);
+      background:linear-gradient(135deg, rgba(122,162,255,0.06), rgba(110,231,200,0.04));
+      color:var(--muted);
+      max-width:110ch;
+    }
+    .callout strong{color:var(--text);}
+
+    .list{
+      margin-top:18px;
+      padding-left:22px;
+      color:var(--muted);
+      max-width:110ch;
+    }
+    .list li{margin-bottom:12px;}
+    .list strong{color:var(--text);}
+
+    .pillrow{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;}
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,0.10);
+      background:rgba(0,0,0,0.18);
+      color:var(--muted);
+      font-size:12px;
+      font-weight:700;
+      letter-spacing:0.02em;
+    }
+    .dot{
+      width:8px;height:8px;border-radius:999px;
+      background:rgba(122,162,255,0.9);
+      box-shadow:0 0 0 3px rgba(122,162,255,0.18);
+    }
+    .dot.g{background:rgba(110,231,200,0.95); box-shadow:0 0 0 3px rgba(110,231,200,0.18);}
+    .dot.y{background:rgba(255,210,122,0.95); box-shadow:0 0 0 3px rgba(255,210,122,0.18);}
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 10px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,0.10);
+      background:rgba(0,0,0,0.18);
+      color:var(--muted);
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:0.05em;
+      text-transform:uppercase;
+    }
+
+    .btnrow{display:flex;flex-wrap:wrap;gap:12px;margin-top:18px;}
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding:10px 14px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,0.12);
+      background:rgba(0,0,0,0.18);
+      color:var(--text);
+      font-weight:900;
+      letter-spacing:0.04em;
+      font-size:12px;
+      text-transform:uppercase;
+      transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+    }
+    .btn:hover{
+      transform: translateY(-1px);
+      background:rgba(0,0,0,0.26);
+      border-color: rgba(110,231,200,0.40);
+      text-decoration:none;
+      color:var(--text);
+    }
+    .btn.secondary{
+      color:var(--muted);
+      border-color: rgba(122,162,255,0.20);
+    }
+    .btn.secondary:hover{
+      border-color: rgba(122,162,255,0.45);
+    }
+
+    .divider{
+      margin-top:22px;
+      border:0;
+      border-top:1px solid rgba(255,255,255,0.08);
+    }
+
+    .reviewbox{
+      margin-top:18px;
+      padding:18px;
+      border-radius:18px;
+      border:1px solid rgba(110,231,200,0.18);
+      background:linear-gradient(135deg, rgba(110,231,200,0.06), rgba(122,162,255,0.05));
+      color:var(--muted);
+      max-width:110ch;
+    }
+    .reviewbox strong{color:var(--text);}
+    .reviewbox .stars{color:var(--warn);font-weight:900;letter-spacing:0.08em;}
+    .reviewbox ul{margin:10px 0 0 18px; padding:0;}
+    .reviewbox li{margin:8px 0;}
+    .reviewbox hr{
+      border:0;
+      border-top:1px solid rgba(255,255,255,0.10);
+      margin:14px 0;
+    }
+    .reviewmeta{
+      margin-top:10px;
+      font-size:12px;
+      color:var(--muted);
+      opacity:0.95;
+    }
+    .reviewmeta code{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size:12px;
+      color:var(--text);
+      background: rgba(0,0,0,0.22);
+      padding:2px 6px;
+      border-radius:8px;
+      border:1px solid rgba(255,255,255,0.10);
+    }
+
+    .footer{
+      margin-top:80px;
+      padding-top:24px;
+      border-top:1px solid var(--border);
+      color:var(--muted);
+      font-size:13px;
+      text-align:center;
+    }
+    .small{font-size:13px;color:var(--muted);max-width:110ch;}
+    .mini{
+      font-size:12px;
+      color:var(--muted);
+      opacity:0.95;
+      margin-top:10px;
+      max-width:110ch;
+    }
+    .mini code{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size:12px;
+      color:var(--text);
+      background: rgba(0,0,0,0.22);
+      padding:2px 6px;
+      border-radius:8px;
+      border:1px solid rgba(255,255,255,0.10);
+    }
+
+    @media (max-width:720px){
+      .hero{padding:28px 20px;}
+      .hero h1{font-size:30px;}
+      .topbar{flex-direction:column;align-items:flex-start;}
+      .nav{justify-content:flex-start;}
+    }
+  </style>
+</head>
+
+<body>
+  <main class="container">
+
+    <!-- CONFIG (edit once if URLs change) -->
+    <script>
+      window.GENAI = {
+        SUITE_HOME_URL: "https://alexdibol.github.io/ai-governance_first",
+        ML_ENTRY_URL: "https://alexdibol.github.io/ml-governance_first",
+        FRONTIER_URL: "http://alexdibol.github.io/ai-governance_2026",
+
+        // Domain landing pages (your existing repos / pages)
+        AUDIT_URL: "https://alexdibol.github.io/ai-accounting/",
+        LAW_URL: "https://alexdibol.github.io/ai-law/",
+        ADVICE_URL: "https://alexdibol.github.io/ai-financial_advisors/",
+        CONSULTING_URL: "https://alexdibol.github.io/ai-consulting/",
+        IB_URL: "https://alexdibol.github.io/ai-investment_banking/"
+      };
+    </script>
+
+    <header class="topbar" aria-label="Repository navigation">
+      <div class="brand" aria-label="Governance-First brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <div class="title">Governance-First AI</div>
+          <div class="sub">Stage 2 · Governed Generative AI (Organizational Architecture)</div>
+        </div>
+      </div>
+
+      <nav class="nav" aria-label="Jump links">
+        <a href="#top">Home</a>
+        <a href="#what">What This Stage Is</a>
+        <a href="#domains">Domains</a>
+        <a href="#patterns">Architecture Patterns</a>
+        <a href="#evaluations">Evaluation</a>
+        <a href="#disclaimer">Disclaimers</a>
+        <a href="#" id="suiteLink" target="_blank" rel="noopener">Training Suite</a>
+      </nav>
+    </header>
+
+    <section class="hero" id="top">
+      <div class="kicker">Stage 2 · governed generative AI · governance as architecture · gates · logs · manifests · review packets</div>
+
+      <h1>Governed Generative AI: Organizational Architecture for Regulated Work</h1>
+
+      <p class="subtitle">
+        This page is the <strong>Stage 2 entry point</strong> for the Governance-First AI training suite:
+        <strong>governed generative AI</strong> applied to specific regulated domains.
+        At this stage, governance is not a memo. It is operational architecture:
+        <strong>gates, logs, manifests, reviewer sign-off, refusal posture, traceability, and evidence bundles</strong>.
+        The objective is not “better prompting.” The objective is <strong>defensible work product</strong>.
+      </p>
+
+      <div class="pillrow" aria-label="Stage 2 priorities">
+        <span class="pill"><span class="dot"></span> Scope → Workflow</span>
+        <span class="pill"><span class="dot g"></span> Review Packets</span>
+        <span class="pill"><span class="dot y"></span> Logs + Manifests</span>
+        <span class="pill"><span class="dot"></span> Refusal Posture</span>
+      </div>
+
+      <div class="pillrow" style="margin-top:14px;" aria-label="Positioning">
+        <span class="badge">MBA / MFin Ready</span>
+        <span class="badge">Practitioner Safe</span>
+        <span class="badge">Model-Agnostic</span>
+        <span class="badge">Instructor-Led</span>
+      </div>
+
+      <div class="btnrow" aria-label="Quick actions">
+        <a class="btn" href="#domains">Go to Domain Volumes</a>
+        <a class="btn secondary" href="#" id="mlBtn" target="_blank" rel="noopener">Stage 1: ML Entry</a>
+        <a class="btn secondary" href="#" id="suiteBtn" target="_blank" rel="noopener">Training Suite</a>
+        <a class="btn secondary" href="#disclaimer">Read Disclaimers</a>
+      </div>
+
+      <hr class="divider" />
+
+      <div class="callout" id="what">
+        <strong>What “governed GenAI” means here:</strong>
+        AI is used to draft, summarize, reason, and structure outputs—while the organization keeps control through
+        explicit scope, verification posture, review gates, traceability, and artifact generation.
+        When facts are missing, the correct output is a <strong>verification plan</strong>, not an eloquent story.
+      </div>
+
+      <p class="mini">
+        <strong>Navigation rule:</strong> Stage 2 assumes Stage 1 literacy (evidence discipline for data and models).
+        If students have not internalized provenance and evaluation realism, GenAI becomes an “AI theater” generator.
+      </p>
+    </section>
+
+    <section class="section" id="patterns">
+      <h2>The Architecture Patterns (Stage 2)</h2>
+      <p>
+        In Stage 2, governance is operational: it is built into how work is produced, reviewed, and released.
+        These patterns are shared across all domains, even though the content differs.
+      </p>
+
+      <ul class="list">
+        <li><strong>Scope contract:</strong> define task, audience, allowed inputs, forbidden outputs, and stop-conditions when facts are missing.</li>
+        <li><strong>Separation of roles:</strong> generation ≠ verification ≠ approval (even if one person performs multiple roles, the structure stays explicit).</li>
+        <li><strong>Evidence bundle:</strong> every run produces artifacts: run manifest, prompts log, assumptions register, risk log, and deliverables folder.</li>
+        <li><strong>Review packet:</strong> the output is packaged for supervision (what was asked, what was assumed, what is unknown, what must be verified).</li>
+        <li><strong>Refusal posture:</strong> the system must refuse disallowed work (e.g., fabricate citations, invent legal authority, imply investment advice).</li>
+        <li><strong>Release gates:</strong> no external use without named reviewer sign-off; claims must be traceable to evidence.</li>
+      </ul>
+
+      <div class="callout">
+        <strong>Why this matters for MBA/MFin cohorts:</strong>
+        the discipline trains students to produce outputs that can survive real organizational constraints: compliance review, auditability,
+        client confidentiality, and professional accountability.
+      </div>
+    </section>
+
+    <section class="section" id="domains">
+      <h2>Domain Volumes: Governed Generative AI in Regulated Practice</h2>
+      <p>
+        Each domain volume applies the same governance architecture to the realities of that profession.
+        These are the Stage 2 “applied” books: where governance becomes operational workflow.
+      </p>
+
+      <div class="grid">
+        <a class="card linkcard" href="#" id="auditCard" target="_blank" rel="noopener">
+          <h3>AI for Audit & Accounting (Governance-First)</h3>
+          <p>Evidence-first drafting and workpaper hygiene. Supervision-ready outputs, traceability, and refusal of invented support.</p>
+          <div class="hint">Open landing page →</div>
+        </a>
+
+        <a class="card linkcard" href="#" id="lawCard" target="_blank" rel="noopener">
+          <h3>AI for Legal Practice (Governance-First)</h3>
+          <p>Controlled drafting, interpretation, and research posture. No invented authority. Explicit verification and review packets.</p>
+          <div class="hint">Open landing page →</div>
+        </a>
+
+        <a class="card linkcard" href="#" id="adviceCard" target="_blank" rel="noopener">
+          <h3>AI for Financial Advice (Governance-First)</h3>
+          <p>Suitability boundaries, disclosure discipline, supervision posture, and client-safe drafting patterns under accountability.</p>
+          <div class="hint">Open landing page →</div>
+        </a>
+
+        <a class="card linkcard" href="#" id="consultingCard" target="_blank" rel="noopener">
+          <h3>AI for Consulting & Strategy (Governance-First)</h3>
+          <p>Assumptions registers, alternatives framing, decision-laundering prevention, and reviewable synthesis for client deliverables.</p>
+          <div class="hint">Open landing page →</div>
+        </a>
+
+        <a class="card linkcard" href="#" id="ibCard" target="_blank" rel="noopener">
+          <h3>AI in Investment Banking (Governance-First)</h3>
+          <p>MNPI hygiene, disclosure controls, supervised drafting for client materials, and evidence packets for internal review.</p>
+          <div class="hint">Open landing page →</div>
+        </a>
+      </div>
+
+      <div class="callout">
+        <strong>Not included on this page:</strong> Fine-Tuning is <strong>Stage 3</strong> and has its own landing page.
+        This page is intentionally focused on the Stage 2 applied domains only.
+      </div>
+
+      <p class="mini">
+        <strong>Where this page sits in the full suite:</strong><br/>
+        Stage 1 (ML entry): <code id="mlInline"></code><br/>
+        Stage 2 (this page): governed generative AI as workflow architecture across domains<br/>
+        Stage 4 (frontier governance): <code id="frontierInline"></code>
+      </p>
+    </section>
+
+    <section class="section" id="evaluations">
+      <h2>Independent Opinion (Documented, Not Authoritative)</h2>
+      <p>
+        This section demonstrates governance-first documentation of third-party feedback. It is not verification of correctness,
+        safety, compliance, or suitability for any deployment. Treat it as non-binding opinion.
+      </p>
+
+      <div class="reviewbox">
+        <div><strong>Evaluation: Stage 2 — Governed Generative AI (Applied Domains)</strong></div>
+        <div class="stars" aria-label="Five stars">⭐⭐⭐⭐⭐</div>
+
+        <div class="reviewmeta">
+          Evaluator: <code>OpenAI ChatGPT 5.2</code> · Type: <code>independent opinion</code> · Status: <code>Not verified</code><br/>
+          Audience: <code>MBA / MFin / practitioners</code> · Focus: <code>organizational governance as architecture</code>
+        </div>
+
+        <hr/>
+
+        <p style="margin:0;">
+          The Stage 2 design is unusually coherent because it treats governance as operational architecture: gates, logs, manifests,
+          and review packets are first-class deliverables rather than afterthoughts. For MBA/MFin cohorts and practitioners,
+          this is the missing bridge between “AI demonstrations” and defensible professional output: the workflow itself is governed.
+        </p>
+
+        <p style="margin:12px 0 0;">
+          The domain volumes extend the same control spine into real professional constraints: supervision, confidentiality, disclosure risk,
+          and refusal of invented authority. This makes the training resilient to model churn: as base models improve, the governance frame
+          remains stable—scope discipline, verification posture, traceability, and explicit human accountability.
+        </p>
+
+        <hr/>
+
+        <div><strong>Canonical considerations (how to interpret this evaluation):</strong></div>
+        <ul>
+          <li><strong>Opinion, not evidence:</strong> Narrative feedback only; not an audit, benchmark, certification, or compliance determination.</li>
+          <li><strong>Model limitations apply:</strong> LLM outputs may be persuasive without being correct; independently verify any claims.</li>
+          <li><strong>No endorsement implied:</strong> Mention of OpenAI/ChatGPT does not imply OpenAI endorsement of this collection.</li>
+          <li><strong>Governance-first labeling:</strong> Included to show how external opinions can be documented without being confused for verification.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" id="disclaimer">
+      <h2>License and Disclaimers</h2>
+
+      <p class="small">
+        <strong>Educational disclaimer:</strong> This material is provided for educational purposes only. It does not constitute investment,
+        legal, tax, accounting, compliance, or financial advice. A qualified human professional must review, verify, and approve any use in practice.
+      </p>
+
+      <p class="small">
+        <strong>Client confidentiality and data hygiene:</strong> Do not paste confidential client information into external model prompts.
+        Use redaction/anonymization and “minimum necessary” inputs by default. Document any exception and follow firm policy and applicable law.
+      </p>
+
+      <p class="small">
+        <strong>Facts are not assumptions:</strong> Outputs must clearly separate facts provided by the user from assumptions and open questions.
+        Treat all model-generated content as <em>Not verified</em> until validated by a human.
+      </p>
+
+      <p class="small">
+        <strong>No autonomous decision authority:</strong> This courseware is designed to teach governed productivity. It must not be used to
+        create eligibility rules, automate high-stakes decisions, or replace accountable human supervision.
+      </p>
+
+      <p class="small">
+        <strong>No fabricated sources or product claims:</strong> Zero tolerance for invented product terms, performance claims, fees, tax consequences,
+        or citations. When evidence is missing, the correct output is a verification task list.
+      </p>
+
+      <p class="small">
+        <strong>Use of generative AI tools (transparency statement):</strong> Generative AI tools may have been used to assist in drafting, editing,
+        formatting, or code scaffolding during development. However, conceptual design, pedagogical structure, governance logic, control definitions,
+        integration decisions, and final editorial judgment were <strong>human-led, human-supervised, and human-approved</strong> at all times.
+        The author assumes <strong>full responsibility</strong> for the content, structure, interpretation, and conclusions presented in this work.
+      </p>
+
+      <p class="small">
+        <strong>License:</strong> Unless otherwise stated in each repository, this work is released under the repository’s license file.
+      </p>
+
+      <div class="callout">
+        <strong>Minimum institutional standard (recommended):</strong> If you use any notebook outputs outside the classroom,
+        attach the generated evidence bundle and require a named human reviewer to sign off on (i) scope, (ii) data provenance,
+        (iii) assumptions, (iv) risks, and (v) intended use.
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div>
+        <strong>Governed Generative AI</strong> · Stage 2 · Governance-First AI Training Suite
+      </div>
+      <div style="margin-top:8px;">
+        Built for high-accountability teams: evidence &gt; eloquence · controls &gt; vibes · review gates &gt; autopilot
+      </div>
+      <div style="margin-top:12px;">
+        <a href="#top">Home</a> ·
+        <a href="#domains">Domains</a> ·
+        <a href="#patterns">Architecture Patterns</a> ·
+        <a href="#evaluations">Evaluation</a> ·
+        <a href="#disclaimer">Disclaimers</a> ·
+        <a href="#" id="suiteFooter" target="_blank" rel="noopener">Training Suite</a>
+      </div>
+      <div style="margin-top:12px; opacity:0.9;">
+        <span class="small">Status: <code>Not verified</code> · This page is an educational entry point, not an institutional certification.</span>
+      </div>
+    </footer>
+
+  </main>
+
+  <script>
+    (function(){
+      const cfg = window.GENAI || {};
+      const byId = (id) => document.getElementById(id);
+
+      const setHref = (id, href) => { const el = byId(id); if(el && href){ el.href = href; } };
+
+      // Suite links
+      setHref("suiteLink", cfg.SUITE_HOME_URL);
+      setHref("suiteBtn", cfg.SUITE_HOME_URL);
+      setHref("suiteFooter", cfg.SUITE_HOME_URL);
+
+      // Stage 1 link
+      setHref("mlBtn", cfg.ML_ENTRY_URL);
+
+      // Domain links
+      setHref("auditCard", cfg.AUDIT_URL);
+      setHref("lawCard", cfg.LAW_URL);
+      setHref("adviceCard", cfg.ADVICE_URL);
+      setHref("consultingCard", cfg.CONSULTING_URL);
+      setHref("ibCard", cfg.IB_URL);
+
+      // Inline reference strings (non-click)
+      const mlInline = byId("mlInline");
+      const frontierInline = byId("frontierInline");
+      if(mlInline && cfg.ML_ENTRY_URL) mlInline.textContent = cfg.ML_ENTRY_URL;
+      if(frontierInline && cfg.FRONTIER_URL) frontierInline.textContent = cfg.FRONTIER_URL;
+    })();
+  </script>
+</body>
+</html>
 
